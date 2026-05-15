@@ -3,10 +3,11 @@
 > **DIY 蒸馏工坊** — 把 Needle 模型微调到你自己的领域,部署到桌面/手机,断网可用。
 > 给"想让产品里塞一个 26M 工具调用模型"的开发者一套可复制的流水线。
 
+[![CI](https://github.com/MackDing/needle-edge-kit/actions/workflows/test.yml/badge.svg)](https://github.com/MackDing/needle-edge-kit/actions/workflows/test.yml)
+[![tests](https://img.shields.io/badge/tests-117%20passing-success)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Based on Needle](https://img.shields.io/badge/based%20on-Cactus--Compute%2Fneedle-green.svg)](https://github.com/cactus-compute/needle)
-[![tests](https://img.shields.io/badge/tests-110%20passing-success)](tests/)
 
 ---
 
