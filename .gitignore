@@ -39,9 +39,7 @@ mobile/android/build/
 mobile/android/app/build/
 desktop/dist/
 desktop/python/
-package-lock.json
-desktop/package-lock.json
-tests/package-lock.json
+# (package-lock.json files ARE committed — needed for npm ci / reproducible installs)
 
 # IDE
 .idea/
