@@ -1,0 +1,135 @@
+[
+  {
+    "name": "launch_app",
+    "description": "Launch a desktop application by name. Use the friendly name users say, not the full path.",
+    "parameters": {
+      "app": {"type": "string", "description": "App name e.g. 'chrome', 'vscode', 'slack', 'calculator'"}
+    },
+    "required": ["app"]
+  },
+  {
+    "name": "open_file",
+    "description": "Open a file or folder in its default application or file manager.",
+    "parameters": {
+      "path": {"type": "string", "description": "Absolute or ~-prefixed path"}
+    },
+    "required": ["path"]
+  },
+  {
+    "name": "search_files",
+    "description": "Find files by name pattern under a directory. Returns a list of paths.",
+    "parameters": {
+      "query": {"type": "string", "description": "Filename glob or substring"},
+      "directory": {"type": "string", "description": "Where to search. Defaults to home if omitted."},
+      "limit": {"type": "integer", "description": "Max results. Default 50."}
+    },
+    "required": ["query"]
+  },
+  {
+    "name": "set_system_volume",
+    "description": "Adjust system audio output volume.",
+    "parameters": {
+      "level": {"type": "integer", "description": "0-100, target percentage"}
+    },
+    "required": ["level"]
+  },
+  {
+    "name": "set_display_brightness",
+    "description": "Adjust monitor brightness (laptop screens or DDC-CI compatible monitors).",
+    "parameters": {
+      "level": {"type": "integer", "description": "0-100"}
+    },
+    "required": ["level"]
+  },
+  {
+    "name": "clipboard_get",
+    "description": "Read current clipboard contents as text.",
+    "parameters": {},
+    "required": []
+  },
+  {
+    "name": "clipboard_set",
+    "description": "Write text to the clipboard.",
+    "parameters": {
+      "text": {"type": "string"}
+    },
+    "required": ["text"]
+  },
+  {
+    "name": "screenshot",
+    "description": "Take a screenshot. Saves to a path or copies to clipboard.",
+    "parameters": {
+      "mode": {"type": "string", "enum": ["full", "window", "region"], "description": "Capture mode"},
+      "destination": {"type": "string", "enum": ["file", "clipboard"], "description": "Where to put it"}
+    },
+    "required": ["mode"]
+  },
+  {
+    "name": "run_shell",
+    "description": "Execute a shell command. DANGEROUS — must be user-confirmed in the app layer.",
+    "parameters": {
+      "command": {"type": "string", "description": "Single shell command, no pipes to dangerous tools"},
+      "shell": {"type": "string", "enum": ["powershell", "cmd", "bash"], "description": "Which shell"}
+    },
+    "required": ["command", "shell"]
+  },
+  {
+    "name": "convert_image",
+    "description": "Convert an image file to another format and/or resize/compress it.",
+    "parameters": {
+      "input":  {"type": "string", "description": "Source path"},
+      "format": {"type": "string", "enum": ["png","jpg","webp","heic","gif"], "description": "Target format"},
+      "max_kb": {"type": "integer", "description": "Target max size in KB. Optional."},
+      "width":  {"type": "integer", "description": "Resize to this width. Optional."}
+    },
+    "required": ["input", "format"]
+  },
+  {
+    "name": "create_note",
+    "description": "Create a quick text note in the default notes app.",
+    "parameters": {
+      "title":   {"type": "string"},
+      "content": {"type": "string"}
+    },
+    "required": ["content"]
+  },
+  {
+    "name": "set_timer",
+    "description": "Start a countdown timer that notifies when done.",
+    "parameters": {
+      "minutes": {"type": "integer"},
+      "label":   {"type": "string", "description": "Optional"}
+    },
+    "required": ["minutes"]
+  },
+  {
+    "name": "send_notification",
+    "description": "Show a system notification.",
+    "parameters": {
+      "title":   {"type": "string"},
+      "body":    {"type": "string"}
+    },
+    "required": ["title", "body"]
+  },
+  {
+    "name": "switch_display_mode",
+    "description": "Toggle dark/light mode, night light, or focus assist.",
+    "parameters": {
+      "mode": {
+        "type": "string",
+        "enum": ["dark","light","night_light_on","night_light_off","focus_on","focus_off"]
+      }
+    },
+    "required": ["mode"]
+  },
+  {
+    "name": "git_action",
+    "description": "Run a common git action in a repo. Use for devs only.",
+    "parameters": {
+      "action": {"type": "string", "enum": ["status","pull","push","commit","branch_list"]},
+      "repo":   {"type": "string", "description": "Repo path. Defaults to current directory."},
+      "message": {"type": "string", "description": "Only for action=commit"}
+    },
+    "required": ["action"]
+  }
+]

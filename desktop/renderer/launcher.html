@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Needle</title>
+  <style>
+    :root {
+      --bg:        rgba(28, 30, 35, 0.72);
+      --bg-solid:  #1c1e23;
+      --border:    rgba(255, 255, 255, 0.08);
+      --text:      #f3f4f6;
+      --dim:       #8b9098;
+      --accent:    #6aa9ff;
+      --ok:        #58d68d;
+      --err:       #ff6b6b;
+      --card:      rgba(255, 255, 255, 0.04);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: transparent;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                   "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    .shell {
+      width: 100%;
+      background: var(--bg);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+      overflow: hidden;
+      -webkit-app-region: drag;
+    }
+
+    .input-row {
+      display: flex; align-items: center;
+      padding: 18px 22px;
+      -webkit-app-region: drag;
+    }
+    .icon {
+      width: 22px; height: 22px;
+      margin-right: 14px;
+      opacity: 0.55;
+      flex-shrink: 0;
+    }
+    .icon.thinking { animation: spin 0.9s linear infinite; opacity: 0.9; color: var(--accent); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    input.q {
+      -webkit-app-region: no-drag;
+      flex: 1;
+      background: transparent;
+      border: 0; outline: 0;
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      caret-color: var(--accent);
+    }
+    input.q::placeholder { color: var(--dim); font-weight: 300; }
+
+    .hint {
+      font-size: 11px;
+      color: var(--dim);
+      margin-left: 10px;
+      padding: 2px 7px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+      -webkit-app-region: no-drag;
+    }
+
+    .results {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+      -webkit-app-region: no-drag;
+    }
+    .results.show { max-height: 520px; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 18px;
+    }
+
+    .result-list {
+      padding: 10px 14px 14px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .result-list::-webkit-scrollbar { width: 8px; }
+    .result-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+
+    .card {
+      display: flex; align-items: center;
+      padding: 12px 14px;
+      margin: 4px 0;
+      background: var(--card);
+      border-radius: 10px;
+      font-size: 13px;
+      transition: background 0.15s;
+      opacity: 0;
+      animation: slideIn 0.22s forwards;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:hover { background: rgba(255,255,255,0.07); }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .status-dot.ok    { background: var(--ok);  box-shadow: 0 0 8px rgba(88, 214, 141, 0.5); }
+    .status-dot.err   { background: var(--err); }
+    .status-dot.run   { background: var(--accent); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .card-body { flex: 1; min-width: 0; }
+    .card-name { font-weight: 500; color: var(--text); }
+    .card-args { color: var(--dim); font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-tail { color: var(--dim); font-size: 11px; margin-left: 12px; flex-shrink: 0; }
+
+    .empty {
+      padding: 28px;
+      text-align: center;
+      color: var(--dim);
+      font-size: 13px;
+    }
+
+    .footer {
+      display: flex; justify-content: space-between;
+      padding: 8px 18px;
+      font-size: 10.5px;
+      color: var(--dim);
+      letter-spacing: 0.4px;
+      -webkit-app-region: no-drag;
+    }
+    kbd {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 10px;
+      margin: 0 2px;
+    }
+
+    /* Win 11 fallback when no transparency available */
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: rgba(245, 245, 247, 0.85);
+        --text: #1d1d1f;
+        --dim: #6e6e73;
+        --border: rgba(0, 0, 0, 0.08);
+        --card: rgba(0, 0, 0, 0.04);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="input-row">
+      <svg id="icon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="20" y1="20" x2="16.5" y2="16.5"/>
+      </svg>
+      <input id="q" class="q" placeholder="Ask Needle…" autofocus spellcheck="false" />
+      <span class="hint" id="hint">⏎</span>
+    </div>
+
+    <div class="results" id="results">
+      <div class="divider"></div>
+      <div class="result-list" id="list"></div>
+    </div>
+
+    <div class="footer">
+      <span><kbd>↩</kbd> run</span>
+      <span id="latency"></span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const q = $('q'), results = $('results'), list = $('list'),
+          latency = $('latency'), icon = $('icon'), hint = $('hint');
+
+    let toolsCache = null;
+    let busy = false;
+
+    // Tools file is configurable via main.js → preload → query string.
+    // Default OA (matches our trained model). Switch via:
+    //   window.needle.toolsPath()   (preload exposes this from env)
+    async function loadTools() {
+      if (toolsCache) return toolsCache;
+      const path = (await window.needle.toolsPath?.()) || '../../tools/oa_tools.json';
+      const r = await fetch(path).catch(() => null);
+      if (r && r.ok) toolsCache = await r.json();
+      else toolsCache = window.__NEEDLE_FALLBACK_TOOLS__ ?? [];
+      return toolsCache;
+    }
+
+    function reset() {
+      list.innerHTML = '';
+      results.classList.remove('show');
+      latency.textContent = '';
+      icon.classList.remove('thinking');
+    }
+
+    function setIconThinking(on) {
+      if (on) {
+        icon.innerHTML = '<circle cx="12" cy="12" r="9" stroke-dasharray="40 20"/>';
+        icon.classList.add('thinking');
+      } else {
+        icon.innerHTML = '<circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/>';
+        icon.classList.remove('thinking');
+      }
+    }
+
+    function addCard(call, status = 'run', tail = '') {
+      const dot   = `<div class="status-dot ${status}"></div>`;
+      const args  = JSON.stringify(call.arguments);
+      const truncatedArgs = args.length > 60 ? args.slice(0, 57) + '…' : args;
+      const html = `${dot}<div class="card-body">
+                      <div class="card-name">${call.name}</div>
+                      <div class="card-args">${truncatedArgs}</div>
+                    </div>
+                    <div class="card-tail">${tail}</div>`;
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = html;
+      list.appendChild(div);
+      return div;
+    }
+
+    function updateCard(card, status, tail) {
+      const dot = card.querySelector('.status-dot');
+      dot.className = `status-dot ${status}`;
+      if (tail) card.querySelector('.card-tail').textContent = tail;
+    }
+
+    async function run() {
+      if (busy) return;
+      const query = q.value.trim();
+      if (!query) return;
+      busy = true;
+      reset();
+      setIconThinking(true);
+      hint.textContent = '…';
+
+      const t0 = performance.now();
+      try {
+        const tools = await loadTools();
+        const calls = await window.needle.generate(query, tools);
+        const t1 = performance.now();
+
+        if (calls.length === 0) {
+          results.classList.add('show');
+          list.innerHTML = '<div class="empty">Nothing matches that. Try rephrasing.</div>';
+        } else {
+          results.classList.add('show');
+          const cards = calls.map(c => addCard(c, 'run'));
+          const execResults = await window.needle.execute(calls);
+          const t2 = performance.now();
+
+          execResults.forEach((r, i) => {
+            if (r.error)    updateCard(cards[i], 'err', r.error);
+            else            updateCard(cards[i], 'ok', formatOk(r.ok));
+          });
+          latency.textContent = `${(t1-t0)|0} + ${(t2-t1)|0} ms`;
+        }
+      } catch (e) {
+        results.classList.add('show');
+        list.innerHTML = `<div class="empty" style="color: var(--err)">⚠  ${e.message}</div>`;
+      } finally {
+        setIconThinking(false);
+        hint.textContent = '⏎';
+        busy = false;
+      }
+    }
+
+    function formatOk(ok) {
+      if (ok == null) return '✓';
+      if (typeof ok === 'string') return ok.length > 28 ? ok.slice(0, 25) + '…' : ok;
+      if (ok.launched) return ok.launched;
+      if (ok.opened)   return 'opened';
+      if (ok.matches)  return `${ok.matches.length} found`;
+      if (ok.saved)    return 'saved';
+      if (ok.copied)   return 'copied';
+      return '✓';
+    }
+
+    q.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); run(); }
+      else if (e.key === 'Escape') { window.needle.hideLauncher?.(); }
+    });
+
+    window.needle.onShow?.(() => {
+      q.value = '';
+      reset();
+      window.needle.resize?.(88);
+      q.focus();
+    });
+
+    // Watch result panel height → grow the OS window
+    const ro = new ResizeObserver(() => {
+      const h = document.querySelector('.shell').getBoundingClientRect().height;
+      window.needle.resize?.(Math.ceil(h) + 8);
+    });
+    ro.observe(document.querySelector('.shell'));
+
+    q.focus();
+  </script>
+</body>
+</html>

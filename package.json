@@ -1,0 +1,13 @@
+{
+  "name": "needle-edge-kit",
+  "version": "0.1.0",
+  "description": "DIY distillation workshop for on-device tool calling, based on Cactus-Compute/needle",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:js && npm run test:py",
+    "test:js": "npm test --prefix tests",
+    "test:py": "cd tests/python && uv run pytest",
+    "test:watch": "npm run test:watch --prefix tests"
+  },
+  "license": "MIT"
+}

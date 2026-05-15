@@ -1,0 +1,50 @@
+[
+  {
+    "name": "clipboard_get",
+    "description": "Read the current clipboard text. Browser will ask permission the first time.",
+    "parameters": {},
+    "required": []
+  },
+  {
+    "name": "clipboard_set",
+    "description": "Write text to the clipboard.",
+    "parameters": {
+      "text": {"type": "string"}
+    },
+    "required": ["text"]
+  },
+  {
+    "name": "send_notification",
+    "description": "Show a browser notification. User must grant permission.",
+    "parameters": {
+      "title": {"type": "string"},
+      "body":  {"type": "string"}
+    },
+    "required": ["title", "body"]
+  },
+  {
+    "name": "set_timer",
+    "description": "Start a countdown timer that pops a notification when done.",
+    "parameters": {
+      "minutes": {"type": "integer"},
+      "label":   {"type": "string", "description": "Optional"}
+    },
+    "required": ["minutes"]
+  },
+  {
+    "name": "open_url",
+    "description": "Open a URL in a new browser tab.",
+    "parameters": {
+      "url": {"type": "string"}
+    },
+    "required": ["url"]
+  },
+  {
+    "name": "show_message",
+    "description": "Display a message in the on-page result area. Use for queries that don't need any other action.",
+    "parameters": {
+      "text": {"type": "string"}
+    },
+    "required": ["text"]
+  }
+]

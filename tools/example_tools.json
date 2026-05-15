@@ -1,0 +1,121 @@
+[
+  {
+    "name": "set_light_brightness",
+    "description": "Adjust brightness of lights in a specific room or all rooms. Use this when the user wants lights brighter, dimmer, turned on (level=100), or turned off (level=0). Also use for implicit cues like 'too bright' or 'good night'.",
+    "parameters": {
+      "room": {
+        "type": "string",
+        "enum": ["living_room", "bedroom", "kitchen", "bathroom", "hallway", "all"],
+        "description": "Which room. Use 'all' if user wants every light affected."
+      },
+      "level": {
+        "type": "integer",
+        "description": "Brightness 0-100. 0 = off, 100 = max. For 'dim a bit' use 30, for 'brighter' bump 20."
+      }
+    },
+    "required": ["room", "level"]
+  },
+  {
+    "name": "play_music",
+    "description": "Play music by genre, mood, artist, or specific song. Pauses any current playback first.",
+    "parameters": {
+      "genre": {"type": "string", "description": "Genre or mood (e.g. 'jazz', 'classical', 'chill'). Optional."},
+      "artist": {"type": "string", "description": "Artist name. Optional."},
+      "song": {"type": "string", "description": "Specific song title. Optional."}
+    },
+    "required": []
+  },
+  {
+    "name": "control_playback",
+    "description": "Control current music playback: pause, resume, stop, skip, previous, or adjust volume.",
+    "parameters": {
+      "action": {
+        "type": "string",
+        "enum": ["pause", "resume", "stop", "next", "previous", "volume_up", "volume_down", "mute", "unmute"],
+        "description": "What to do"
+      },
+      "volume": {
+        "type": "integer",
+        "description": "Set volume directly 0-100. Only with action=volume_up/down to set absolute. Optional."
+      }
+    },
+    "required": ["action"]
+  },
+  {
+    "name": "set_thermostat",
+    "description": "Set AC/heating target temperature, or turn climate control on/off.",
+    "parameters": {
+      "temperature": {"type": "integer", "description": "Target degrees Celsius, 16-30."},
+      "mode": {
+        "type": "string",
+        "enum": ["cool", "heat", "auto", "off"],
+        "description": "Mode. Use 'off' to turn off."
+      }
+    },
+    "required": ["mode"]
+  },
+  {
+    "name": "lock_door",
+    "description": "Lock or unlock a specific door, or all doors. DANGEROUS: unlock requires user confirmation in the app layer.",
+    "parameters": {
+      "door": {
+        "type": "string",
+        "enum": ["front", "back", "garage", "all"],
+        "description": "Which door"
+      },
+      "locked": {
+        "type": "boolean",
+        "description": "true = lock, false = unlock"
+      }
+    },
+    "required": ["door", "locked"]
+  },
+  {
+    "name": "set_timer",
+    "description": "Start a countdown timer. For absolute times like 'wake me at 7am' use set_alarm instead.",
+    "parameters": {
+      "minutes": {"type": "integer", "description": "Duration in minutes"},
+      "label": {"type": "string", "description": "Optional label e.g. 'laundry'"}
+    },
+    "required": ["minutes"]
+  },
+  {
+    "name": "set_alarm",
+    "description": "Set an alarm at a specific clock time. For relative durations use set_timer.",
+    "parameters": {
+      "time": {"type": "string", "description": "24h time HH:MM"},
+      "label": {"type": "string", "description": "Optional label"}
+    },
+    "required": ["time"]
+  },
+  {
+    "name": "set_reminder",
+    "description": "Create a reminder at a future time or with a delay.",
+    "parameters": {
+      "when": {"type": "string", "description": "Time expression: '10pm', 'in 30 minutes', 'tomorrow 8am'"},
+      "text": {"type": "string", "description": "What to remind about"}
+    },
+    "required": ["when", "text"]
+  },
+  {
+    "name": "control_tv",
+    "description": "TV power and input source.",
+    "parameters": {
+      "power": {"type": "string", "enum": ["on", "off"], "description": "Optional"},
+      "input": {"type": "string", "description": "Input source like 'hdmi1','hdmi2'. Optional."}
+    },
+    "required": []
+  },
+  {
+    "name": "activate_scene",
+    "description": "Activate a pre-configured scene that bundles multiple actions. Prefer specific tools when intent is clear; use scene only when user explicitly says 'movie mode', 'sleep mode', 'morning routine'.",
+    "parameters": {
+      "scene": {
+        "type": "string",
+        "enum": ["movie", "sleep", "morning", "evening", "away", "home"],
+        "description": "Pre-configured scene"
+      }
+    },
+    "required": ["scene"]
+  }
+]

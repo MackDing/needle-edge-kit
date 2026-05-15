@@ -1,0 +1,57 @@
+# env / secrets
+.env
+*.env.local
+*.pid
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.hf_cache/
+.pytest_cache/
+.mutmut-cache
+mutants/
+tests/python/mutants/
+
+# Data & checkpoints (LARGE — too big for git, kept locally only)
+checkpoints/
+oa_run/ckpts/
+oa_run/ckpts_v2/
+oa_run/ckpts_v3/
+oa_run/*.pkl
+examples/*.jsonl
+examples/raw.jsonl
+mobile/assets/*.onnx
+mobile/assets/*.cact
+
+# Run artifacts
+oa_run/*.log
+oa_run/*.log.*.bak
+oa_run/*.err.log
+oa_run/test_ckpt/
+desktop/electron_run.log
+
+# Node
+node_modules/
+mobile/ios/Pods/
+mobile/android/build/
+mobile/android/app/build/
+desktop/dist/
+desktop/python/
+package-lock.json
+desktop/package-lock.json
+tests/package-lock.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.DS_Store
+
+# Logs
+*.log
+wandb/
+
+# Keep sample training data + scenario / tool / scripts in git
+!examples/sample_train.jsonl

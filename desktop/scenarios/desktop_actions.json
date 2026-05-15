@@ -1,0 +1,94 @@
+{
+  "domain": "desktop_command_palette_v1",
+  "description": "Cmd+K / Win+/ style global command bar on a PC. Start from these and grow to 500+.",
+  "scenarios": [
+    "open chrome",
+    "launch vscode",
+    "start slack",
+    "open calculator",
+    "open notepad",
+    "launch terminal",
+    "open task manager",
+
+    "find that pdf about contracts",
+    "search for invoices in downloads",
+    "find all jpgs in pictures",
+    "where's that resume file",
+    "show me files modified today",
+
+    "volume up",
+    "volume to 30",
+    "mute",
+    "make it louder",
+    "音量小一点",
+
+    "screen brightness 50",
+    "make screen brighter",
+    "screen darker",
+    "亮度调到 70",
+
+    "copy this to clipboard: hello world",
+    "what's in my clipboard",
+    "paste my email signature",
+
+    "take a screenshot",
+    "screenshot just this window",
+    "snip a region and copy to clipboard",
+    "full screen screenshot to file",
+
+    "switch to dark mode",
+    "light mode please",
+    "turn on night light",
+    "enable focus mode",
+    "turn off do not disturb",
+
+    "convert this png to webp",
+    "compress this image to 200kb",
+    "resize image.jpg to 800 wide",
+    "把这张图转成 webp 然后压到 1mb",
+
+    "remind me in 25 minutes to take a break",
+    "10 minute pomodoro",
+    "timer for 5 min coffee",
+
+    "notify me 'meeting in 5'",
+    "send a notification when this is done",
+
+    "git status",
+    "git pull on this repo",
+    "list branches",
+    "commit with message 'wip auth fix'",
+    "查一下 git 状态",
+
+    "open my downloads folder",
+    "show me ~/projects/needle",
+    "open .env in vscode",
+
+    "run pwsh: Get-Process | Sort CPU -Desc | Select -First 5",
+    "execute 'docker ps' in bash",
+    "run dir in cmd",
+
+    "create a note titled 'meeting prep' with the body 'q3 numbers'",
+    "quick note: remember to call mom",
+
+    "transcribe my flight to tokyo",
+    "book a hotel for next weekend",
+    "what's the weather",
+    "tell me a joke",
+    "play music",
+
+    "screenshot, compress to 100kb, save to desktop",
+    "find biggest files in downloads then open the folder",
+    "dark mode and volume to 20",
+    "open vscode and pull the latest git changes",
+    "screenshot and copy to clipboard then open paint",
+    "set volume to 30 and start a 5 minute timer",
+    "git commit with message 'wip' and then push",
+    "open chrome and search for invoices in downloads",
+    "convert this png to webp and copy path to clipboard",
+    "dim the screen and turn on focus mode",
+    "compress image to 500kb then send a notification when done",
+    "find all pdfs in documents and open the folder",
+    "launch terminal and run 'docker ps' in bash"
+  ]
+}

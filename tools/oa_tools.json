@@ -1,0 +1,229 @@
+[
+  {
+    "name": "submit_leave_request",
+    "description": "Submit a leave request to the OA workflow system. Use when an employee wants to apply for time off — annual leave, sick leave, personal leave, maternity, paternity, bereavement, or marriage leave. If the user just says '请假' or 'leave' without specifying type, default to 'personal' and let downstream UI confirm.",
+    "parameters": {
+      "type": {
+        "type": "string",
+        "enum": ["annual", "sick", "personal", "maternity", "paternity", "bereavement", "marriage"],
+        "description": "Leave type. annual=年假, sick=病假, personal=事假, maternity=产假, paternity=陪产假, bereavement=丧假, marriage=婚假"
+      },
+      "start_date": {"type": "string", "description": "ISO date 2026-05-20 or natural language like 'tomorrow', '明天', '下周一'. Downstream parser handles the conversion."},
+      "end_date":   {"type": "string", "description": "Same format as start_date. For single-day leave, end = start."},
+      "reason":     {"type": "string", "description": "Optional reason text"}
+    },
+    "required": ["type", "start_date", "end_date"]
+  },
+  {
+    "name": "submit_business_trip",
+    "description": "Submit a business trip / travel approval request. Triggered by '出差', '出差申请', 'business trip', or any mention of going to another city for work.",
+    "parameters": {
+      "destination": {"type": "string", "description": "City or specific location, e.g. '上海', 'Shanghai', '客户现场'"},
+      "start_date":  {"type": "string", "description": "Departure date"},
+      "end_date":    {"type": "string", "description": "Return date"},
+      "purpose":     {"type": "string", "description": "Trip purpose, e.g. 'customer visit', '项目验收'"}
+    },
+    "required": ["destination", "start_date", "end_date"]
+  },
+  {
+    "name": "submit_overtime",
+    "description": "Submit an overtime / extra-hours work request for approval. Triggered by '加班', 'overtime', or any context where the employee will work beyond standard hours and wants comp time or pay.",
+    "parameters": {
+      "date":  {"type": "string", "description": "Date of the overtime"},
+      "hours": {"type": "number",  "description": "Number of overtime hours, e.g. 3 or 8"},
+      "reason": {"type": "string", "description": "Why overtime is needed"}
+    },
+    "required": ["date", "hours"]
+  },
+  {
+    "name": "submit_reimbursement",
+    "description": "Submit an expense reimbursement claim — taxi, meal, hotel, supplies, etc. Triggered by '报销', '发票报销', 'expense', or any mention of money spent for work that needs paying back.",
+    "parameters": {
+      "category": {
+        "type": "string",
+        "enum": ["meal", "transport", "accommodation", "supplies", "communication", "training", "other"],
+        "description": "meal=餐费, transport=交通, accommodation=住宿, supplies=办公用品, communication=通讯费, training=培训费"
+      },
+      "amount":    {"type": "number", "description": "Amount in RMB"},
+      "occurred_on": {"type": "string", "description": "Date the expense occurred"},
+      "description": {"type": "string", "description": "Free text describing the expense"}
+    },
+    "required": ["category", "amount"]
+  },
+  {
+    "name": "book_meeting_room",
+    "description": "Reserve a meeting room. Triggered by '订会议室', '会议室预订', 'book a room', or any scheduling intent mentioning a room.",
+    "parameters": {
+      "date":     {"type": "string", "description": "Date for the booking"},
+      "start_time": {"type": "string", "description": "Start time HH:MM"},
+      "end_time":   {"type": "string", "description": "End time HH:MM"},
+      "room":     {"type": "string", "description": "Specific room name like 'A301' or 'Sky', optional — system picks if omitted"},
+      "headcount": {"type": "integer", "description": "Expected number of attendees"}
+    },
+    "required": ["date", "start_time", "end_time"]
+  },
+  {
+    "name": "schedule_meeting",
+    "description": "Schedule a meeting with specific colleagues. Different from book_meeting_room: this creates a calendar event and notifies attendees. Use for '约个会', '安排会议', 'schedule a meeting with X'.",
+    "parameters": {
+      "title":      {"type": "string", "description": "Meeting topic"},
+      "date":       {"type": "string", "description": "Date"},
+      "start_time": {"type": "string", "description": "Start time HH:MM"},
+      "duration_min": {"type": "integer", "description": "Duration in minutes, default 30 if not specified"},
+      "attendees":  {"type": "string", "description": "Comma-separated names or emails: '张三, 李四, alice@'"}
+    },
+    "required": ["title", "date", "start_time"]
+  },
+  {
+    "name": "find_colleague",
+    "description": "Look up a colleague's contact info — phone, email, department, manager — from the company directory. Triggered by '查电话', '找…的联系方式', 'who is X', 'X's contact'.",
+    "parameters": {
+      "name_or_id": {"type": "string", "description": "Person's name, employee ID, or partial name"}
+    },
+    "required": ["name_or_id"]
+  },
+  {
+    "name": "submit_it_ticket",
+    "description": "Open a ticket with IT support — broken laptop, account locked, VPN issues, software install, password reset. Triggered by 'IT', '电脑坏了', 'reset password', '账号被锁', or any tech-help request.",
+    "parameters": {
+      "category": {
+        "type": "string",
+        "enum": ["hardware", "software", "network", "account", "email", "vpn", "other"],
+        "description": "Problem category"
+      },
+      "summary":  {"type": "string", "description": "One-line description of the problem"},
+      "urgency":  {"type": "string", "enum": ["low", "medium", "high"], "description": "Default medium"}
+    },
+    "required": ["category", "summary"]
+  },
+  {
+    "name": "query_approval_status",
+    "description": "Check the status of a previously submitted workflow — leave, expense, purchase etc. Triggered by '查审批进度', '我那个报销批了吗', 'status of my request'.",
+    "parameters": {
+      "workflow_type": {
+        "type": "string",
+        "enum": ["leave", "trip", "overtime", "reimbursement", "purchase", "any"],
+        "description": "Type of workflow to query; use 'any' if user didn't specify"
+      },
+      "reference_id":  {"type": "string", "description": "Specific request ID if mentioned, otherwise omit"}
+    },
+    "required": ["workflow_type"]
+  },
+  {
+    "name": "cancel_approval",
+    "description": "Withdraw / revoke a previously submitted approval request that is still pending. Triggered by '撤回申请', '撤销', 'cancel my request'.",
+    "parameters": {
+      "reference_id": {"type": "string", "description": "Request ID; if user didn't give one, pass 'latest' and downstream picks the most recent pending one"}
+    },
+    "required": ["reference_id"]
+  },
+  {
+    "name": "forward_approval",
+    "description": "Re-assign an approval task (currently in the user's queue) to another colleague. Triggered by '转交审批', '让 X 帮我批', 'forward approval to X'.",
+    "parameters": {
+      "task_id":  {"type": "string", "description": "Task ID or 'latest' for the most recent pending one in user's queue"},
+      "to_user":  {"type": "string", "description": "Target colleague name or email"}
+    },
+    "required": ["task_id", "to_user"]
+  },
+  {
+    "name": "query_attendance",
+    "description": "Query attendance records — clock-in/out times, missing punches, lateness. Triggered by '查考勤', '我这个月迟到几次', 'attendance for last week'.",
+    "parameters": {
+      "period": {
+        "type": "string",
+        "enum": ["today", "yesterday", "this_week", "last_week", "this_month", "last_month", "custom"],
+        "description": "Time range"
+      },
+      "start_date": {"type": "string", "description": "Only used when period=custom"},
+      "end_date":   {"type": "string", "description": "Only used when period=custom"}
+    },
+    "required": ["period"]
+  },
+  {
+    "name": "query_leave_balance",
+    "description": "Check remaining leave entitlement. Triggered by '剩多少年假', '还有几天假', 'how much leave do I have left'.",
+    "parameters": {
+      "type": {
+        "type": "string",
+        "enum": ["annual", "sick", "personal", "all"],
+        "description": "Which leave type; 'all' returns every category"
+      }
+    },
+    "required": ["type"]
+  },
+  {
+    "name": "query_payroll",
+    "description": "View payslip / salary breakdown / tax info for a specific month. Triggered by '看工资条', '上个月工资', 'payslip'.",
+    "parameters": {
+      "month": {"type": "string", "description": "YYYY-MM, e.g. 2026-04. Defaults to last month if omitted."}
+    },
+    "required": []
+  },
+  {
+    "name": "submit_purchase_request",
+    "description": "Request to purchase office supplies, equipment, software licenses, etc. Triggered by '采购申请', '想买…', 'purchase request', 'order X for the team'.",
+    "parameters": {
+      "item":   {"type": "string", "description": "What to buy"},
+      "quantity": {"type": "integer", "description": "How many"},
+      "estimated_amount": {"type": "number", "description": "Estimated RMB cost"},
+      "justification":  {"type": "string", "description": "Why this is needed"}
+    },
+    "required": ["item", "quantity"]
+  },
+  {
+    "name": "register_visitor",
+    "description": "Pre-register a visitor coming to the office. Triggered by '访客登记', '我有客户来', 'visitor coming tomorrow'.",
+    "parameters": {
+      "visitor_name": {"type": "string"},
+      "visit_date":   {"type": "string"},
+      "visit_time":   {"type": "string", "description": "HH:MM"},
+      "company":      {"type": "string", "description": "Visitor's company"}
+    },
+    "required": ["visitor_name", "visit_date"]
+  },
+  {
+    "name": "request_vehicle",
+    "description": "Request a company car / driver for business use. Triggered by '用车申请', '派车', 'request a car'.",
+    "parameters": {
+      "date":      {"type": "string"},
+      "start_time": {"type": "string"},
+      "destination": {"type": "string"},
+      "passengers":  {"type": "integer", "description": "Number of people"}
+    },
+    "required": ["date", "start_time", "destination"]
+  },
+  {
+    "name": "submit_seal_use",
+    "description": "Request to use a company seal / stamp on a document. Triggered by '用印', '盖章申请', 'seal request', 'stamp the contract'.",
+    "parameters": {
+      "seal_type": {
+        "type": "string",
+        "enum": ["company", "finance", "contract", "hr", "legal"],
+        "description": "Which seal"
+      },
+      "document_title": {"type": "string", "description": "Title or short description of the document"},
+      "use_date":  {"type": "string"},
+      "copies":    {"type": "integer", "description": "How many copies to stamp"}
+    },
+    "required": ["seal_type", "document_title", "copies"]
+  },
+  {
+    "name": "search_knowledge_base",
+    "description": "Search the internal wiki / knowledge base / regulations. Triggered by '查公司规定', '怎么申请…的流程', 'how do I…', 'what's the policy on…'.",
+    "parameters": {
+      "query": {"type": "string", "description": "Search query in natural language"}
+    },
+    "required": ["query"]
+  },
+  {
+    "name": "borrow_equipment",
+    "description": "Borrow company equipment — projector, laptop, camera, demo device. Triggered by '借设备', '借投影', 'borrow X for a meeting'.",
+    "parameters": {
+      "equipment_type": {"type": "string", "description": "What to borrow"},
+      "borrow_date":    {"type": "string"},
+      "return_date":    {"type": "string"}
+    },
+    "required": ["equipment_type", "borrow_date", "return_date"]
+  }
+]

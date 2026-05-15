@@ -1,0 +1,56 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  vitest:
+    name: vitest (JS/TS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+      - run: npm ci
+        working-directory: tests
+      - run: npm test
+        working-directory: tests
+
+  pytest:
+    name: pytest (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      - run: uv sync
+        working-directory: tests/python
+      - run: uv run pytest
+        working-directory: tests/python
+
+  mutation:
+    # Informational only — surfaces weak tests but never blocks merge.
+    # mutmut on Linux is reliable; on Windows+Docker-Desktop+WSL it has known issues.
+    name: mutation (Python, informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: pytest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync
+        working-directory: tests/python
+      - run: uv add --dev mutmut
+        working-directory: tests/python
+      - name: Run mutmut
+        run: |
+          uv run mutmut run || true
+          uv run mutmut results || true
+        working-directory: tests/python

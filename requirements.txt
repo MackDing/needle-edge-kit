@@ -1,0 +1,12 @@
+# Core (install needle separately: pip install -e path/to/needle)
+google-genai>=0.3.0
+python-dotenv>=1.0.0
+
+# Conversion (Step 4, optional)
+tensorflow>=2.16,<2.20
+tf2onnx>=1.16.0
+onnx>=1.15.0
+onnxruntime>=1.17.0
+
+# Eval helpers (Step 3, optional)
+numpy>=1.26

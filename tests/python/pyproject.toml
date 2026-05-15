@@ -1,0 +1,33 @@
+[project]
+name = "needle-edge-kit-python-tests"
+version = "0.1.0"
+description = "pytest suite for the Python helpers in needle-edge-kit"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "fastapi>=0.110",
+    "httpx>=0.27",          # required by FastAPI TestClient
+    # mutmut is CI-only (Linux). It conflicts with Docker Desktop's WSL
+    # integration on local Windows machines. Installed ad-hoc in the
+    # mutation CI job — see .github/workflows/test.yml
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+norecursedirs = ["mutants", ".venv", "__pycache__", ".pytest_cache"]
+
+[tool.mutmut]
+# Mutation testing runs ONLY on Linux/Mac/WSL (mutmut 3 lacks Windows support).
+# CI runs it via the test workflow; locally on Windows, use WSL.
+paths_to_mutate = "../../scripts/gen_parsers.py"
+tests_dir = "."
+# Tests must be runnable as `pytest test_gen_parsers.py` from this dir.
+# The runner is the *test harness* command mutmut invokes once per mutant.
+runner = "python -m pytest -x -q test_gen_parsers.py"
+# Skip slow/redundant mutants
+also_copy = ["conftest.py"]
