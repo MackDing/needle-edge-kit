@@ -14,7 +14,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 const DESKTOP = path.resolve(__dirname, '../desktop');
 
@@ -136,11 +136,13 @@ describe('Electron files parse cleanly (node --check)', () => {
                    'host_functions/windows.js', 'host_functions/darwin.js']) {
     it(`${f} has valid JS syntax`, () => {
       const full = path.join(DESKTOP, f);
-      // node --check exits non-zero on syntax error and writes to stderr
-      try {
-        execSync(`node --check "${full}"`, { stdio: 'pipe' });
-      } catch (e: any) {
-        throw new Error(`${f}: ${e.stderr?.toString() ?? e.message}`);
+      // Use spawnSync with array args (no shell) so this works regardless of
+      // process.platform — execSync(string) routes through the platform's
+      // shell, which trips when setup.ts pins process.platform='win32' on
+      // a Linux CI runner.
+      const r = spawnSync(process.execPath, ['--check', full], { stdio: 'pipe' });
+      if (r.status !== 0) {
+        throw new Error(`${f}: ${r.stderr?.toString() ?? r.error?.message ?? 'unknown'}`);
       }
     });
   }
